@@ -1,0 +1,39 @@
+#    Name: 13415
+#    Modification time : Tue Aug  8 19:54:57 2017
+
+@<TRIPOS>MOLECULE
+13415
+   18     0     6     0     0
+SMALL
+NO_CHARGES
+
+
+@<TRIPOS>ATOM
+      1 N          25.6030   10.8370  -11.7310 N.am      1 SEL1        0.0000 
+      2 N          23.6750   12.3930  -13.9810 N.am      1 SEL1        0.0000 
+      3 N          25.2790   10.9490  -14.4510 N.am      1 SEL1        0.0000 
+      4 NZ         23.6750   12.3930  -13.9810 N.4       2 LYL3        0.0000 
+      5 NZ         25.2790   10.9490  -14.4510 N.4       2 LYL3        0.0000 
+      6 N          27.6180    9.3980  -13.2640 N.am      3 SEP1        0.0000 
+      7 N          24.7250   14.4910  -15.7270 N.am      3 SEP1        0.0000 
+      8 N          21.1650   13.1450  -14.3840 N.am      3 SEP1        0.0000 
+      9 N          26.0940   12.9050  -16.6730 N.am      3 SEP1        0.0000 
+     10 N          26.1756    9.2368  -17.2402 N.am      3 SEP1        0.0000 
+     11 NZ         25.4190   14.0420  -16.7700 N.4       4 LYP3        0.0000 
+     12 N          26.6105   10.1175  -12.4975 N.am      5 SEC1        0.0000 
+     13 N          24.2000   13.4420  -14.8540 N.am      5 SEC1        0.0000 
+     14 N          22.4200   12.7690  -14.1825 N.am      5 SEC1        0.0000 
+     15 N          25.6865   11.9270  -15.5620 N.am      5 SEC1        0.0000 
+     16 N          25.7273   10.0929  -15.8456 N.am      5 SEC1        0.0000 
+     17 NZ         24.5470   13.2175  -15.3755 N.4       6 LYC3        0.0000 
+     18 NZ         25.3490   12.4955  -15.6105 N.4       6 LYC3        0.0000 
+@<TRIPOS>BOND
+@<TRIPOS>SUBSTRUCTURE
+     1 SEL1        1 GROUP        1 Z    SEL  0     ROOT SEL Z 0
+     2 LYL3        4 GROUP        1 Z    LYL  0     **** LYL Z 2
+     3 SEP1        6 GROUP        1 Z    SEP  0     **** SEP Z 7
+     4 LYP3       11 GROUP        1 Z    LYP  0     **** LYP Z 9
+     5 SEC1       12 GROUP        1 Z    SEC  0     **** SEC Z 14
+     6 LYC3       17 GROUP        1 Z    LYC  0     **** LYC Z 16
+@<TRIPOS>SET
+

@@ -1,0 +1,29 @@
+#    Name: 16504
+#    Modification time : Wed Aug  9 00:47:26 2017
+
+@<TRIPOS>MOLECULE
+16504
+    8     0     6     0     0
+SMALL
+NO_CHARGES
+
+
+@<TRIPOS>ATOM
+      1 N           6.8330    9.3870   -5.8540 N.am      1 SEL1        0.0000 
+      2 Zn         14.2370    1.5450   -4.1640 Zn        2 ZIL7        0.0000 
+      3 Zn         12.0880   -0.0510   -4.9640 Zn        2 ZIL7        0.0000 
+      4 N           5.9350   10.1280   -2.7490 N.am      3 SEP1        0.0000 
+      5 Zn         12.4170    1.3490   -3.1780 Zn        4 ZIP7        0.0000 
+      6 N           6.3840    9.7575   -4.3015 N.am      5 SEC1        0.0000 
+      7 Zn         13.3270    1.4470   -3.6710 Zn        6 ZIC7        0.0000 
+      8 Zn         12.2525    0.6490   -4.0710 Zn        6 ZIC7        0.0000 
+@<TRIPOS>BOND
+@<TRIPOS>SUBSTRUCTURE
+     1 SEL1        1 GROUP        1 Z    SEL  0     ROOT SEL Z 0
+     2 ZIL7        2 GROUP        1 Z    ZIL  0     **** ZIL Z 5
+     3 SEP1        4 GROUP        1 Z    SEP  0     **** SEP Z 7
+     4 ZIP7        5 GROUP        1 Z    ZIP  0     **** ZIP Z 12
+     5 SEC1        6 GROUP        1 Z    SEC  0     **** SEC Z 14
+     6 ZIC7        7 GROUP        1 Z    ZIC  0     **** ZIC Z 19
+@<TRIPOS>SET
+
