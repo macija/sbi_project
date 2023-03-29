@@ -208,9 +208,11 @@ fout.close()
 example = 'P00517'
 
 UNIPROT_map = {}
-job_id = submit_id_maping(from_db="UniProtKB_AC-ID", to="UniprotKB", ids=example)
+job_id = submit_id_mapping(from_db="UniProtKB_AC-ID", to_db="UniProtKB", ids=[example])
 if check_id_mapping_results_ready(job_id):
     link = get_id_mapping_results_link(job_id)
     results = get_id_mapping_results_search(link)
 
+#with open('c:\\Users\\UB\\Documents\\sbi_project\\scPDB_clustering\\kk.txt', 'w') as test_out:
 print(results)
+        
