@@ -1,6 +1,6 @@
-# data.py file from tfbio.data (installing it with conda was problematic)
-# only kept the functions we needed to use (featurizer and make_grid)
+# Featurizer() and make_grid() are functions copied from tfbio.data package.
 # source data: https://gitlab.com/cheminfIBB/tfbio/-/blob/master/tfbio/data.py
+# validate() 
 
 import pickle
 import numpy as np

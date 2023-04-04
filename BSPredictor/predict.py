@@ -19,6 +19,44 @@ def arg_parser():
     return parser.parse_args()
 
 
+
+def get_coords(file_path, file_type):
+    atom_coords = []
+    residues = []
+    with open(file_path, "r") as file:
+        
+        if file_type == "mol2":
+            start = False
+            for line in file:
+                if "@<TRIPOS>ATOM" in line:
+                    start = True
+                elif "@<TRIPOS>BOND" in line:
+                    start = False
+                elif start == True:
+                    x = float(line[17:26])
+                    y = float(line[27:36])
+                    z = float(line[37:46])
+                    res = line[64:72].strip()
+                    atom_coords.append([x,y,z])
+                    residues.append(res)
+                    
+        elif file_type == "pdb":
+            for line in file:
+                if line.startswith("ATOM") or line.startswith("HETATM"):
+                        x = float(line[31:38])
+                        y = float(line[39:46])
+                        z = float(line[47:55])
+
+                        res_num = line[23:27]
+                        res_name = line[17:20]
+                        res = (res_name + res_num).strip()
+                        
+                        atom_coords.append([x,y,z])
+                        residues.append(res)
+                
+            
+    return atom_coords, residues
+
 def get_aminoacids(prot_path, lig_prediction_path, prot_filetype, lig_filetype):
     '''
     List all the aminoacids that are 4A in any direction from any of the
@@ -26,42 +64,7 @@ def get_aminoacids(prot_path, lig_prediction_path, prot_filetype, lig_filetype):
     '''
     #TODO - It will work differently for mol2 and for pdb. 
     
-    def get_coords(file_path, file_type):
-        atom_coords = []
-        residues = []
-        with open(file_path, "r") as file:
-            
-            if file_type == "mol2":
-                start = False
-                for line in file:
-                    if "@<TRIPOS>ATOM" in line:
-                        start = True
-                    elif "@<TRIPOS>BOND" in line:
-                        start = False
-                    elif start == True:
-                        x = float(line[17:26])
-                        y = float(line[27:36])
-                        z = float(line[37:46])
-                        res = line[64:72].strip()
-                        atom_coords.append([x,y,z])
-                        residues.append(res)
-                        
-            elif file_type == "pdb":
-                for line in file:
-                    if line.startswith("ATOM") or line.startswith("HETATM"):
-                            x = float(line[31:38])
-                            y = float(line[39:46])
-                            z = float(line[47:55])
 
-                            res_num = line[23:27]
-                            res_name = line[17:20]
-                            res = (res_name + res_num).strip()
-                            
-                            atom_coords.append([x,y,z])
-                            residues.append(res)
-                    
-                
-        return atom_coords, residues
 
 
     # Get coordinates for protein and predicted binding site    
@@ -93,9 +96,6 @@ def get_aminoacids(prot_path, lig_prediction_path, prot_filetype, lig_filetype):
     print("nearby residues to the ligand binding site are:")
     print(nearby_residues)
 
-            
-
-    
 
 
 def main():
@@ -122,7 +122,7 @@ def main():
         
     # Predict binding sites
     model=PUResNet()
-    model.load_weights('model_weights.h5')
+    model.load_weights('../../model_weights.h5')
     if args.mode==0:
         mol=next(pybel.readfile(args.file_format,args.input_path))
         o_path=os.path.join(args.output_path,os.path.basename(args.input_path))

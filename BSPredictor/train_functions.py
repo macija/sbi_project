@@ -6,7 +6,7 @@ from openbabel import pybel, openbabel
 from sklearn.model_selection import train_test_split
 
 from data import Featurizer, make_grid
-from MyModel import PUResNet
+from PUResNet import PUResNet
 
 
 def get_grids(file_type, prot_input_file, bs_input_file=None,
@@ -62,11 +62,13 @@ def get_grids(file_type, prot_input_file, bs_input_file=None,
     
     return prot_grid, bs_grid, centroid
 
+
 def get_training_data(input_folder):
     """
     Returns a np array containing the protein grids, one np array with the binding_sites grids,
     and the ceentroid coordinates for each one. 
-    """
+    """   
+    advance = 0
     proteins = None
     binding_sites = None
     centroids = []
@@ -74,9 +76,9 @@ def get_training_data(input_folder):
         for dir in dirs:
 
             protein_file = os.path.join(root, dir, "protein.mol2")
-            ligand_file = os.path.join(root, dir, "ligand.mol2")
+            site_file = os.path.join(root, dir, "cavity6.mol2")
             
-            prot_grid, bs_grid, centroid = get_grids("mol2", protein_file, ligand_file)
+            prot_grid, bs_grid, centroid = get_grids("mol2", protein_file, site_file)
             
             if proteins is None:
                 proteins = prot_grid
@@ -92,9 +94,6 @@ def get_training_data(input_folder):
     print("Number of proteins to train the model:", proteins.shape[0])
     # TODO - Centroids are completely unnecessary to maintain
     return proteins, binding_sites, centroids
-
-proteins, binding_sites, _ = get_training_data("scPDB_similarproteins")
-
 
 
 def DiceLoss(targets, inputs, smooth=1e-6):
@@ -115,9 +114,3 @@ def DiceLoss(targets, inputs, smooth=1e-6):
     intersection = K.sum(targets * inputs)
     dice = (2*intersection + smooth) / (K.sum(targets) + K.sum(inputs) + smooth)
     return 1 - dice
-
-
-X_train, X_test, y_train, y_test = train_test_split(proteins, 
-                                                    binding_sites, 
-                                                    test_size=0.33, 
-                                                    random_state=42)
