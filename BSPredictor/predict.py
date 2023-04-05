@@ -3,7 +3,7 @@ from openbabel import pybel
 from PUResNet import PUResNet
 import argparse
 import numpy as np
-
+import glob
 
 def arg_parser():
     '''
@@ -57,7 +57,7 @@ def get_coords(file_path, file_type):
             
     return atom_coords, residues
 
-def get_aminoacids(prot_path, lig_prediction_path, prot_filetype, lig_filetype):
+def get_aminoacids(prot_path, out_path, prot_filetype, bs_filetype):  
     '''
     List all the aminoacids that are 4A in any direction from any of the
     points predicted as ligand by the program and save them in (?)
@@ -66,49 +66,49 @@ def get_aminoacids(prot_path, lig_prediction_path, prot_filetype, lig_filetype):
     
 
 
+    for pocket in glob.glob(out_path+'/pocket*'):
+        # Get coordinates for protein and predicted binding site    
+        lig_coords, _ = get_coords(pocket, bs_filetype) 
+        prot_coords, residues = get_coords(prot_path, prot_filetype) 
+        
+        # Get the coordinates of a box that comprises all ligand prediction points 
+        # +-4A    
+        lig_coords_m = np.matrix(lig_coords)
+        x_min = lig_coords_m.min(0).item((0,0)) - 4
+        y_min = lig_coords_m.min(0).item((0,1)) - 4
+        z_min = lig_coords_m.min(0).item((0,2)) - 4
+        x_max = lig_coords_m.max(0).item((0,0)) + 4
+        y_max = lig_coords_m.max(0).item((0,1)) + 4
+        z_max = lig_coords_m.max(0).item((0,2)) + 4
+        
+        # Check if protein coordinate is inside the box. If it is, check if euclidean
+        # distance with any of ligand points is <4A
+        
+        nearby_residues = []
+        for index,prot_atom in enumerate(prot_coords):
+            x,y,z = prot_atom
+            if x_min < x < x_max and y_min < y < y_max and z_min < z < z_max:
+                for lig_atom in lig_coords:
+                    dist = np.linalg.norm(np.asarray(prot_atom) - np.asarray(lig_atom))
+                    if dist < 4:
+                        nearby_residues.append(residues[index])
+        nearby_residues = list(set(nearby_residues))
+        print("nearby residues to the ligand binding site %s are:" %(os.path.basename(os.path.normpath(pocket))))
+        print(nearby_residues)
 
-    # Get coordinates for protein and predicted binding site    
-    lig_coords, _ = get_coords(lig_prediction_path, lig_filetype) 
-    prot_coords, residues = get_coords(prot_path, prot_filetype) 
-    
-    # Get the coordinates of a box that comprises all ligand prediction points 
-    # +-4A    
-    lig_coords_m = np.matrix(lig_coords)
-    x_min = lig_coords_m.min(0).item((0,0)) - 4
-    y_min = lig_coords_m.min(0).item((0,1)) - 4
-    z_min = lig_coords_m.min(0).item((0,2)) - 4
-    x_max = lig_coords_m.max(0).item((0,0)) + 4
-    y_max = lig_coords_m.max(0).item((0,1)) + 4
-    z_max = lig_coords_m.max(0).item((0,2)) + 4
-    
-    # Check if protein coordinate is inside the box. If it is, check if euclidean
-    # distance with any of ligand points is <4A
-    
-    nearby_residues = []
-    for index,prot_atom in enumerate(prot_coords):
-        x,y,z = prot_atom
-        if x_min < x < x_max and y_min < y < y_max and z_min < z < z_max:
-            for lig_atom in lig_coords:
-                dist = np.linalg.norm(np.asarray(prot_atom) - np.asarray(lig_atom))
-                if dist < 4:
-                    nearby_residues.append(residues[index])
-    nearby_residues = list(set(nearby_residues))
-    print("nearby residues to the ligand binding site are:")
-    print(nearby_residues)
-
-    #### SAVE a .MOL2 WITH BINDING SITE
-    orig_prot =next(pybel.readfile(prot_filetype,prot_path))
-    non_bs_atoms = []
-    for i in range(orig_prot.OBMol.NumAtoms()): #iterates over atoms of the original protein
-        atom = orig_prot.OBMol.GetAtom(i+1)
-        resname = atom.GetResidue().GetName()  #gets the residues of each atom
-        if resname not in nearby_residues: #cheks if the residues are the ones we want 
-            non_bs_atoms.append(atom)
-    for atom in non_bs_atoms:
-        orig_prot.OBMol.DeleteAtom(atom)
-    output_bs =  pybel.Outputfile('mol2', lig_prediction_path) #put here the name of the file we want.
-    output_bs.write(orig_prot)
-    output_bs.close()
+        #### SAVE a .MOL2 WITH BINDING SITE
+        orig_prot =next(pybel.readfile(prot_filetype,prot_path))
+        non_bs_atoms = []
+        for i in range(orig_prot.OBMol.NumAtoms()): #iterates over atoms of the original protein
+            atom = orig_prot.OBMol.GetAtom(i+1)
+            resname = atom.GetResidue().GetName()  #gets the residues of each atom
+            if resname not in nearby_residues: #cheks if the residues are the ones we want 
+                non_bs_atoms.append(atom)
+        for atom in non_bs_atoms:
+            orig_prot.OBMol.DeleteAtom(atom)
+        output_bs =  pybel.Outputfile('mol2', out_path+'/bs_'+os.path.basename(os.path.normpath(pocket))) #put here the name of the file we want.
+        output_bs.write(orig_prot)
+        output_bs.close()
 
 
 
@@ -136,7 +136,7 @@ def main():
         
     # Predict binding sites
     model=PUResNet()
-    model.load_weights('../../model_weights.h5')
+    model.load_weights('train_test_families_1rep_best_weights.h5')
     if args.mode==0:
         mol=next(pybel.readfile(args.file_format,args.input_path))
         o_path=os.path.join(args.output_path,os.path.basename(args.input_path))
@@ -144,7 +144,9 @@ def main():
             os.mkdir(o_path)
         model.save_pocket_mol2(mol,o_path,args.output_format)
         # TODO - check how the save_pocket_mol2 handles the filenames
-        get_aminoacids(args.input_path, os.path.join(args.output_path, "protein.mol2/pocket0.pdb"), args.file_format, args.output_format)
+
+        get_aminoacids(args.input_path, o_path, args.file_format, args.output_format) #changed here the o_path
+    
     elif args.mode==1:
         for name in os.listdir(args.input_path):
             mol_path=os.path.join(args.input_path,name)
