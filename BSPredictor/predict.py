@@ -96,6 +96,20 @@ def get_aminoacids(prot_path, lig_prediction_path, prot_filetype, lig_filetype):
     print("nearby residues to the ligand binding site are:")
     print(nearby_residues)
 
+    #### SAVE a .MOL2 WITH BINDING SITE
+    orig_prot =next(pybel.readfile(prot_filetype,prot_path))
+    non_bs_atoms = []
+    for i in range(orig_prot.OBMol.NumAtoms()): #iterates over atoms of the original protein
+        atom = orig_prot.OBMol.GetAtom(i+1)
+        resname = atom.GetResidue().GetName()  #gets the residues of each atom
+        if resname not in nearby_residues: #cheks if the residues are the ones we want 
+            non_bs_atoms.append(atom)
+    for atom in non_bs_atoms:
+        orig_prot.OBMol.DeleteAtom(atom)
+    output_bs =  pybel.Outputfile('mol2', lig_prediction_path) #put here the name of the file we want.
+    output_bs.write(orig_prot)
+    output_bs.close()
+
 
 
 def main():
@@ -139,6 +153,7 @@ def main():
             if not os.path.exists(o_path):
                 os.mkdir(o_path)
             model.save_pocket_mol2(mol,o_path,args.output_format)
+    
 
 if __name__=='__main__':
     main()
