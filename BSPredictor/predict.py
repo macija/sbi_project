@@ -57,14 +57,14 @@ def get_coords(file_path, file_type):
             
     return atom_coords, residues
 
-def get_aminoacids(prot_path, lig_prediction_path, prot_filetype, lig_filetype):
+def get_aminoacids(prot_path, o_path, prot_filetype, lig_filetype):
     '''
     List all the aminoacids that are 4A in any direction from any of the
     points predicted as ligand by the program and save them in (?)
     '''
-    #TODO - It will work differently for mol2 and for pdb. 
     
-
+    lig_prediction_path = os.path.join(o_path, "pocket0."+lig_filetype)
+    bs_path = os.path.join(o_path, "site.mol2")
 
 
     # Get coordinates for protein and predicted binding site    
@@ -106,7 +106,7 @@ def get_aminoacids(prot_path, lig_prediction_path, prot_filetype, lig_filetype):
             non_bs_atoms.append(atom)
     for atom in non_bs_atoms:
         orig_prot.OBMol.DeleteAtom(atom)
-    output_bs =  pybel.Outputfile('mol2', lig_prediction_path) #put here the name of the file we want.
+    output_bs =  pybel.Outputfile('mol2', bs_path) #put here the name of the file we want.
     output_bs.write(orig_prot)
     output_bs.close()
 
@@ -139,12 +139,14 @@ def main():
     model.load_weights('../../TrainData/train_test_families_1rep_best_weights.h5')
     if args.mode==0:
         mol=next(pybel.readfile(args.file_format,args.input_path))
-        o_path=os.path.join(args.output_path,os.path.basename(args.input_path))
+        # Use as output path the basename of the input protein without its extension
+        o_path=os.path.join(args.output_path,os.path.basename(os.path.splitext(args.input_path)[0]))
         if not os.path.exists(o_path):
             os.mkdir(o_path)
+            
         model.save_pocket_mol2(mol,o_path,args.output_format)
         # TODO - check how the save_pocket_mol2 handles the filenames
-        get_aminoacids(args.input_path, os.path.join(args.output_path, "protein.mol2/pocket0.pdb"), args.file_format, args.output_format)
+        get_aminoacids(args.input_path, o_path, args.file_format, args.output_format)
     elif args.mode==1:
         for name in os.listdir(args.input_path):
             mol_path=os.path.join(args.input_path,name)
