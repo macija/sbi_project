@@ -122,7 +122,7 @@ def main():
         
     # Predict binding sites
     model=PUResNet()
-    model.load_weights('../../model_weights.h5')
+    model.load_weights('../../TrainData/train_test_families_1rep_best_weights.h5')
     if args.mode==0:
         mol=next(pybel.readfile(args.file_format,args.input_path))
         o_path=os.path.join(args.output_path,os.path.basename(args.input_path))
