@@ -15,7 +15,10 @@ def arg_parser():
     parser.add_argument('--input_path','-i',required=True,type=str,help='For mode 0 provide absolute or relative path for protein structure. For mode 1 provide absolute or relative path for folder containing protein structure')
     parser.add_argument('--output_format','-otype',required=False,type=str,default='mol2',help='Provide the output format for predicted binding side. All formats supported by Open Babel')
     parser.add_argument('--output_path','-o',required=False,type=str,default='output',help='path to model output')
+    parser.add_argument('--model_weights','-mw',required=False,type=str,default='../../model_weights.h5',help='path to model weights to predict')
     parser.add_argument('--gpu','-gpu',required=False,type=str,help='Provide GPU device if you want to use GPU like: 0 or 1 or 2 etc.')
+    parser.add_argument('--verbose','-v',required=False, action='store_true', help='Activate warnings and other information about the model')
+    
     return parser.parse_args()
 
 
@@ -64,8 +67,6 @@ def get_aminoacids(prot_path, out_path, prot_filetype, bs_filetype):
     '''
     #TODO - It will work differently for mol2 and for pdb. 
     
-
-
     for pocket in glob.glob(out_path+'/pocket*'):
         # Get coordinates for protein and predicted binding site    
         lig_coords, _ = get_coords(pocket, bs_filetype) 
@@ -93,8 +94,10 @@ def get_aminoacids(prot_path, out_path, prot_filetype, bs_filetype):
                     if dist < 4:
                         nearby_residues.append(residues[index])
         nearby_residues = list(set(nearby_residues))
-        print("nearby residues to the ligand binding site %s are:" %(os.path.basename(os.path.normpath(pocket))))
+        print("List of nearby residues to the ligand binding site %s:" %(os.path.basename(os.path.normpath(pocket))))
         print(nearby_residues)
+        print("")
+        
 
         #### SAVE a .MOL2 WITH BINDING SITE
         orig_prot =next(pybel.readfile(prot_filetype,prot_path))
@@ -106,7 +109,7 @@ def get_aminoacids(prot_path, out_path, prot_filetype, bs_filetype):
                 non_bs_atoms.append(atom)
         for atom in non_bs_atoms:
             orig_prot.OBMol.DeleteAtom(atom)
-        output_bs =  pybel.Outputfile('mol2', out_path+'/bs_'+os.path.basename(os.path.normpath(pocket))) #put here the name of the file we want.
+        output_bs =  pybel.Outputfile('mol2', out_path+'/site_'+os.path.basename(os.path.normpath(pocket)), overwrite=True) #put here the name of the file we want.
         output_bs.write(orig_prot)
         output_bs.close()
 
@@ -133,13 +136,17 @@ def main():
     if args.gpu:
         os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
         os.environ["CUDA_VISIBLE_DEVICES"]=args.gpu
+    if args.verbose:
+        pybel.ob.obErrorLog.StartLogging()
+    else:
+        pybel.ob.obErrorLog.StopLogging()        
         
     # Predict binding sites
     model=PUResNet()
-    model.load_weights('train_test_families_1rep_best_weights.h5')
+    model.load_weights(args.model_weights)
     if args.mode==0:
         mol=next(pybel.readfile(args.file_format,args.input_path))
-        o_path=os.path.join(args.output_path,os.path.basename(args.input_path))
+        o_path=os.path.join(args.output_path,os.path.splitext(os.path.basename(args.input_path))[0])
         if not os.path.exists(o_path):
             os.mkdir(o_path)
         model.save_pocket_mol2(mol,o_path,args.output_format)
