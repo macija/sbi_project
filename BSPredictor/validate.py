@@ -25,12 +25,12 @@ def get_bs_coords(file_type, actual_bs_file, pred_bs_file,
 
 
            
-def get_predicted_bs(prot_format, prot_path, o_path):
+def get_predicted_bs(prot_format, prot_path, o_path, weights_path):
     """
     Return the predicted binding site for a given protein
     """
     model=PUResNet()
-    model.load_weights('../../model_weights.h5')
+    model.load_weights(weights_path)
     
     prot = next(pybel.readfile(prot_format, prot_path))
     
@@ -98,7 +98,7 @@ def calculate_DVO(actual_bs_coords, pred_bs_coords):
     return dvo
             
     
-def validate(val_subset, output_folder):
+def validate(val_subset, output_folder, weights_path):
     total_val_proteins = 0
     predicted_pockets = 0
     dcc_success = 0
@@ -112,7 +112,7 @@ def validate(val_subset, output_folder):
             actual_bs_file = os.path.join(root, dir, "cavity6.mol2")
             
             # If cavity has been predicted
-            predicted_bs_file = get_predicted_bs("mol2", protein_file, os.path.join(output_folder, dir))
+            predicted_bs_file = get_predicted_bs("mol2", protein_file, os.path.join(output_folder, dir), weights_path)
             
             # Check if any cavity has been predicted
             if os.path.exists(predicted_bs_file):
@@ -138,4 +138,4 @@ def validate(val_subset, output_folder):
     
 
 if __name__=='__main__':
-    validate("../../TrainData/scPDB_similarproteins", "output")
+    validate("../../TrainData/val_subset", "output", "../../TrainData/train_test_families_1rep_best_weights.h5")
