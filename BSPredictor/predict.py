@@ -15,9 +15,9 @@ def arg_parser():
     parser.add_argument('--input_path','-i',required=True,type=str,help='For mode 0 provide absolute or relative path for protein structure. For mode 1 provide absolute or relative path for folder containing protein structure')
     parser.add_argument('--output_format','-otype',required=False,type=str,default='mol2',help='Provide the output format for predicted binding side. All formats supported by Open Babel')
     parser.add_argument('--output_path','-o',required=False,type=str,default='output',help='path to model output')
-    parser.add_argument('--model_weights','-mw',required=False,type=str,default='../../model_weights.h5',help='path to model weights to predict')
+    parser.add_argument('--model_weights','-mw',required=False,type=str,default='../../model_weights.h5',help='path to model weights')
     parser.add_argument('--gpu','-gpu',required=False,type=str,help='Provide GPU device if you want to use GPU like: 0 or 1 or 2 etc.')
-    parser.add_argument('--verbose','-v',required=False, action='store_true', help='Activate warnings and other information about the model')
+    parser.add_argument('--verbose','-v',required=False, action='store_true', help='Activate OpenBabel warnings')
     
     return parser.parse_args()
 
