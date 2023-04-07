@@ -1,0 +1,16 @@
+Validating the model.
+Changed validate.py to give all dccs and dvos.
+Validation .ipynb runs validate.py to do the predictions usign our modle and obtaining all dccs
+ and dvos.
+
+Used: input folder with all the copied directores from scPDB for the validation set
+output_our where the prediction using validate.py results will be stored
+input_fpocket where all proteins used also in the other input are converted to pdb using:
+
+	for i in scPDB/*; do obabel -imol2 ${i}/protein.mol2 -opdb -O input_fpocket/${i:6:10}; done
+since fpockets needs a pdb...
+
+the output of pocket lies in the same folder but in subdirectories.
+
+input for puresnet put in folder input_puresnet like this:
+for i in scPDB/*; do cp ${i}/protein.mol2 input_puresnet/${i:6:8}.mol2; done
