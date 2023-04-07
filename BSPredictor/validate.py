@@ -95,6 +95,7 @@ def calculate_DVO(actual_bs_coords, pred_bs_coords):
     
     # Calculate the Dice Volume Overlap (DVO)
     dvo = intersect / union
+    
     return dvo
             
     
