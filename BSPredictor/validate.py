@@ -104,6 +104,8 @@ def validate(val_subset, output_folder, weights_path):
     predicted_pockets = 0
     dcc_success = 0
     dvo_vals = []
+    worst_dcc, best_dvo = 0, 0
+    worst_dcc_dir, best_dvo_dir = "", ""
     for root, dirs, _ in os.walk(val_subset, topdown=False):
         for dir in dirs:
             total_val_proteins +=1
@@ -131,12 +133,21 @@ def validate(val_subset, output_folder, weights_path):
                 dcc_success += 1
                 dvo = calculate_DVO(actual_bs_coords, pred_bs_coords)
                 dvo_vals.append(dvo)
+                if dvo > best_dvo:
+                    best_dvo = dvo
+                    best_dvo_dir = dir
+            else:
+                if dcc > worst_dcc:
+                    worst_dcc = dcc
+                    worst_dcc_dir = dir
+                    
     
     print("··············SUMMARY··············")
     print(f"Predicted pockets:       {predicted_pockets / total_val_proteins}") 
     print(f"Predictions with DCC<4A: {dcc_success / total_val_proteins}")           
-    print(f"Mean value for DVO:      {sum(dvo_vals) / len(dvo_vals)}")    
+    print(f"Mean value for DVO:      {sum(dvo_vals) / len(dvo_vals)}")
+    print(f"Worst dcc ({worst_dcc}) is from protein {worst_dcc_dir}")
+    print(f"Best dvo ({best_dvo}) is from protein {best_dvo_dir}")    
     
-
 if __name__=='__main__':
     validate("../../TrainData/val_subset", "output", "../../TrainData/train_test_families_1rep_best_weights.h5")
