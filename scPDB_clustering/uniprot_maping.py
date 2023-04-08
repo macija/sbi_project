@@ -170,38 +170,37 @@ def get_id_mapping_results_stream(url):
     )
     return decode_results(request, file_format, compressed)
 
-if __name_ == '__main__':
-    ######## READING PDB LIST ########
-    PDB_list = []
-    with open('scPDB_clustering/PDB_list_cleansed', 'r') as fopen:
-        for line in fopen:
-            PDB_list.append(line.strip())
-    fopen.close()
+######## READING PDB LIST ########
+PDB_list = []
+with open('scPDB_clustering/PDB_list_cleansed', 'r') as fopen:
+    for line in fopen:
+        PDB_list.append(line.strip())
+fopen.close()
 
-    #PDB_list_ex = PDB_list[:5]
+#PDB_list_ex = PDB_list[:5]
 
-    ######## SEARCHING UNIPROT KB ########
-    UNIPROT_map = {}
-    job_id = submit_id_mapping(from_db="PDB", to_db="UniProtKB", ids=PDB_list)
-    if check_id_mapping_results_ready(job_id):
-        link = get_id_mapping_results_link(job_id)
-        results = get_id_mapping_results_search(link)
+######## SEARCHING UNIPROT KB ########
+UNIPROT_map = {}
+job_id = submit_id_mapping(from_db="PDB", to_db="UniProtKB", ids=PDB_list)
+if check_id_mapping_results_ready(job_id):
+    link = get_id_mapping_results_link(job_id)
+    results = get_id_mapping_results_search(link)
 
-    for i in results['results']:
-        if i['to']['primaryAccession']:
-            if i['to']['primaryAccession'] in UNIPROT_map:
-                UNIPROT_map[i['to']['primaryAccession']].append(i['from'])
-            else:
-                UNIPROT_map[i['to']['primaryAccession']] = [i['from']]
+for i in results['results']:
+    if i['to']['primaryAccession']:
+        if i['to']['primaryAccession'] in UNIPROT_map:
+            UNIPROT_map[i['to']['primaryAccession']].append(i['from'])
         else:
-            raise NameError('The PDB %s was not found to have a primary accession' %(i['from']))
+            UNIPROT_map[i['to']['primaryAccession']] = [i['from']]
+    else:
+        raise NameError('The PDB %s was not found to have a primary accession' %(i['from']))
 
-    ######## SAVE MAPING ########
-    with open('scPDB_clustering/PDB_uniprot_maping.csv', 'w') as fout:
-        for key, value in UNIPROT_map.items():
-            fout.write(key+';'+';'.join(value))
-            fout.write(';\n')
-    fout.close()
+######## SAVE MAPING ########
+with open('scPDB_clustering/PDB_uniprot_maping.csv', 'w') as fout:
+    for key, value in UNIPROT_map.items():
+        fout.write(key+';'+';'.join(value))
+        fout.write(';\n')
+fout.close()
 
 
 
