@@ -16,3 +16,5 @@ Folder scPDB clustering cotains the Jupyter notebooks used to build the training
 Folder Validation contains the scripts used to calculate metrics on our model.
 
 All scripts and jupyter notebooks that are mentioned in the writen document are inside some of these directories.
+
+Please consult the enclosed pdf document with tutorial and more information before runing any prediction. It is imporotant to have all dependencies installed before trying to run any of the scripts. 
