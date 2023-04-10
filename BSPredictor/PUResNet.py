@@ -1,10 +1,3 @@
-#TrialEnv2:
-#conda install -c conda-forge keras
-#conda install -c conda-forge tensorflow
-#conda install -c anaconda scikit-learn
-
-# I can base myself in: https://keras.io/examples/vision/3D_image_classification/
-
 from keras.models import Model
 from keras.layers import Input,Convolution3D,UpSampling3D,BatchNormalization,Activation,Add,Concatenate
 from keras import backend as K

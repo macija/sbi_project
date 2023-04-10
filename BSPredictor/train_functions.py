@@ -30,9 +30,6 @@ def get_grids(file_type, prot_input_file, bs_input_file=None,
     
     # Convert file into pybel object and get the features of the molecule. 
     # If binding site, features is an array of 1s (indicating that bs is present)
-    
-    # TODO - pybel gives a lot of warnings. I should check them and maybe remove some molecules
-    # or see how much does it affect the model
     prot = next(pybel.readfile(file_type,prot_input_file))
     prot_coords, prot_features = featurizer.get_features(prot)
     
@@ -92,7 +89,6 @@ def get_training_data(input_folder):
         
     
     print("Number of proteins to train the model:", proteins.shape[0])
-    # TODO - Centroids are completely unnecessary to maintain
     return proteins, binding_sites, centroids
 
 
