@@ -6,6 +6,10 @@ from data import Featurizer, make_grid
 from predict import get_coords
 import glob
 
+#########################################################
+# validate.py from BSPredictor/ adapted to give all dcc and dvo values
+#########################################################
+
 def get_bs_coords(file_type, actual_bs_file, pred_bs_file, 
                 featurizer=Featurizer(save_molecule_codes=False)):
     
